@@ -46,11 +46,11 @@ func unloadFileContents(db *gorm.DB, paths ...string) error {
 			if fileInfo.IsDir() {
 				// If it's a directory, fetch entries for all files within this directory before deleting
 				cleanedPath := filepath.Clean(path) + "/" // Ensure matching with subpaths
-				var filesToDelete []FileContent
+				var filesToDelete []Context
 				if err := db.Where("path LIKE ?", fmt.Sprintf("%s%%", cleanedPath)).Find(&filesToDelete).Error; err != nil {
 					return err
 				}
-				if err := db.Where("path LIKE ?", fmt.Sprintf("%s%%", cleanedPath)).Delete(&FileContent{}).Error; err != nil {
+				if err := db.Where("path LIKE ?", fmt.Sprintf("%s%%", cleanedPath)).Delete(&Context{}).Error; err != nil {
 					return err
 				}
 				for _, file := range filesToDelete {
@@ -58,7 +58,7 @@ func unloadFileContents(db *gorm.DB, paths ...string) error {
 				}
 			} else {
 				// It's a file, delete the specific entry
-				if err := db.Where("path = ?", path).Delete(&FileContent{}).Error; err != nil {
+				if err := db.Where("path = ?", path).Delete(&Context{}).Error; err != nil {
 					return err
 				}
 				fmt.Println("Unloaded", path)
@@ -66,13 +66,13 @@ func unloadFileContents(db *gorm.DB, paths ...string) error {
 		}
 	} else {
 		// Retrieve all records before deleting them
-		var allFileContents []FileContent
+		var allFileContents []Context
 		if err := db.Find(&allFileContents).Error; err != nil {
 			return fmt.Errorf("failed to retrieve file contents: %w", err)
 		}
 
 		// Delete all records
-		if err := db.Where("1=1").Delete(&FileContent{}).Error; err != nil {
+		if err := db.Where("1=1").Delete(&Context{}).Error; err != nil {
 			return fmt.Errorf("failed to unload file contents: %w", err)
 		}
 

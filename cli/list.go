@@ -23,10 +23,6 @@ var listCmd = &cobra.Command{
 			return err
 		}
 
-		for _, path := range paths {
-			fmt.Println(path)
-		}
-
 		if len(paths) == 0 {
 			fmt.Println("Nothing to list.")
 		}
@@ -41,13 +37,14 @@ func init() {
 
 // New function to list all file paths
 func ListFilePaths(db *gorm.DB) ([]string, error) {
-	var files []FileContent
+	var files []Context
 	if result := db.Find(&files); result.Error != nil {
 		return nil, result.Error
 	}
 
 	paths := make([]string, len(files))
 	for i, file := range files {
+		fmt.Println(file.Path, "-", file.Tokens)
 		paths[i] = file.Path
 	}
 

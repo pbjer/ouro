@@ -40,14 +40,14 @@ func InitDB() (*gorm.DB, error) {
 		}
 	}
 
-	dbPath := filepath.Join(ouroDir, "memory.db")
+	dbPath := filepath.Join(ouroDir, "sqlite.db")
 	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
 
 	// Migrate the schema
-	err = db.AutoMigrate(&FileContent{})
+	err = db.AutoMigrate(&Context{})
 	if err != nil {
 		return nil, err
 	}
