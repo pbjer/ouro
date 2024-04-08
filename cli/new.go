@@ -47,7 +47,7 @@ func InitDB() (*gorm.DB, error) {
 	}
 
 	// Migrate the schema
-	err = db.AutoMigrate(&Context{})
+	err = db.AutoMigrate(&Context{}, &Plan{})
 	if err != nil {
 		return nil, err
 	}

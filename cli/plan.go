@@ -7,6 +7,8 @@ import (
 	"ouro/internal/prompt"
 	"strings"
 
+	"gorm.io/gorm"
+
 	"github.com/spf13/cobra"
 )
 
@@ -23,33 +25,12 @@ var planCmd = &cobra.Command{
 
 		description := args[0]
 
-		thread := llm.NewThread(
-			llm.SystemMessage(prompt.PlannerSystemPrompt))
-
-		var context []Context
-		db.Find(&context)
-
-		if len(context) == 0 {
-			return errors.New("failed to load context for plan")
-		}
-
-		createPlan, err := prompt.New(prompt.PlannerCreatePlanPrompt, prompt.PlannerCreatePlanData{
-			Change:  description,
-			Context: NewContextPrompter(context...).Prompt(),
-		}).Render()
+		plan, err := NewPlanner(db).Plan(description)
 		if err != nil {
 			return err
 		}
 
-		thread.AddMessages(llm.UserMessage(createPlan))
-
-		err = llm.NewClient().Generate(thread)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println("Plan:")
-		fmt.Println(thread.LastMessage().Content)
+		fmt.Println(plan.Content)
 
 		return nil
 	},
@@ -76,4 +57,49 @@ func (p *ContextPrompter) Prompt() string {
 
 func NewContextPrompter(context ...Context) *ContextPrompter {
 	return &ContextPrompter{context}
+}
+
+type Planner struct {
+	db *gorm.DB
+}
+
+func NewPlanner(db *gorm.DB) *Planner {
+	return &Planner{db}
+}
+
+func (p *Planner) Plan(description string) (*Plan, error) {
+	var context []Context
+	p.db.Find(&context)
+
+	if len(context) == 0 {
+		return nil, errors.New("failed to load context for plan")
+	}
+
+	thread := llm.NewThread(llm.SystemMessage(prompt.PlannerSystemPrompt))
+
+	createPlan, err := prompt.New(prompt.PlannerCreatePlanPrompt, prompt.PlannerCreatePlanData{
+		Change:  description,
+		Context: NewContextPrompter(context...).Prompt(),
+	}).Render()
+	if err != nil {
+		return nil, err
+	}
+
+	thread.AddMessages(llm.UserMessage(createPlan))
+
+	err = llm.NewClient().Generate(thread)
+	if err != nil {
+		return nil, err
+	}
+	plan := Plan{
+		Content: thread.LastMessage().Content,
+	}
+	p.db.Save(&plan)
+
+	return &plan, nil
+}
+
+type Plan struct {
+	gorm.Model
+	Content string
 }
