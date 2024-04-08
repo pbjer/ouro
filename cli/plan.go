@@ -75,9 +75,7 @@ func (p *Planner) Plan(description string) (*Plan, error) {
 		return nil, errors.New("failed to load context for plan")
 	}
 
-	thread := llm.NewThread(llm.SystemMessage(prompt.PlannerSystemPrompt))
-
-	createPlan, err := prompt.New(prompt.PlannerCreatePlanPrompt, prompt.PlannerCreatePlanData{
+	planStartPrompt, err := prompt.New(prompt.PlannerCreatePlanPrompt, prompt.PlannerCreatePlanData{
 		Change:  description,
 		Context: NewContextPrompter(context...).Prompt(),
 	}).Render()
@@ -85,7 +83,10 @@ func (p *Planner) Plan(description string) (*Plan, error) {
 		return nil, err
 	}
 
-	thread.AddMessages(llm.UserMessage(createPlan))
+	thread := llm.NewThread(
+		llm.SystemMessage(prompt.PlannerSystemPrompt),
+		llm.UserMessage(planStartPrompt),
+	)
 
 	err = llm.NewClient().Generate(thread)
 	if err != nil {
