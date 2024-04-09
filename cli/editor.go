@@ -34,7 +34,7 @@ func (e *Editor) WriteToFile(filePath string, content string) error {
 		return err
 	}
 
-	fmt.Printf("Content successfully written to: %s\n", filePath)
+	fmt.Println("Updated", filePath)
 
 	return nil
 }

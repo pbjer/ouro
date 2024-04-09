@@ -63,8 +63,6 @@ func (c *Client) Map(source string, target interface{}) error {
 	prompt += "\nIMPORTANT: THE FIELDS MUST APPEAR IN THE JSON EXACTLY AS WRITTEN ABOVE!"
 	prompt += "\nIMPORTANT: YOU MUST PROPERLY ESCAPE ALL QUOTES WITHIN THE CONTENT SO THAT THE JSON IS VALID!"
 
-	fmt.Println(prompt)
-
 	resp, err := c.client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
@@ -80,8 +78,6 @@ func (c *Client) Map(source string, target interface{}) error {
 	}
 
 	lastMessage := resp.Choices[0].Message.Content
-
-	fmt.Println(lastMessage)
 
 	// Ensure we only have JSON format in the message.
 	if !json.Valid([]byte(lastMessage)) {
