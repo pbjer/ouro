@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -18,7 +19,7 @@ var newCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		// Additional setup tasks can be added here
+		fmt.Println("Initialized ouro")
 		return nil
 	},
 }

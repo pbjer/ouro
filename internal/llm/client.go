@@ -26,7 +26,7 @@ func (c *Client) Generate(thread *Thread) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("\n\nGeneration request tokens: %d\n\n", numTokens)
+	fmt.Println("Request tokens:", numTokens)
 	resp, err := c.client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
