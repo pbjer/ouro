@@ -67,6 +67,11 @@ func NewPlanner(db *gorm.DB) *Planner {
 	return &Planner{db}
 }
 
+type EditorFunction struct {
+	FilenameToChangeOrCreate string `json:"file_name_to_change_or_create"`
+	CompleteFileContents     string `json:"complete_file_contents"`
+}
+
 func (p *Planner) Plan(description string) (*Plan, error) {
 	var context []Context
 	p.db.Find(&context)
@@ -88,7 +93,8 @@ func (p *Planner) Plan(description string) (*Plan, error) {
 		llm.UserMessage(planStartPrompt),
 	)
 
-	err = llm.NewClient().Generate(thread)
+	client := llm.NewClient()
+	err = client.Generate(thread)
 	if err != nil {
 		return nil, err
 	}
@@ -96,6 +102,12 @@ func (p *Planner) Plan(description string) (*Plan, error) {
 		Content: thread.LastMessage().Content,
 	}
 	p.db.Save(&plan)
+
+	result := EditorFunction{}
+	err = client.Map(plan.Content, &result)
+	if err != nil {
+		return nil, err
+	}
 
 	return &plan, nil
 }
