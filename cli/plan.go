@@ -2,9 +2,9 @@ package cli
 
 import (
 	"errors"
-	"fmt"
 	"ouro/internal/llm"
 	"ouro/internal/prompt"
+	"path/filepath"
 	"strings"
 
 	"gorm.io/gorm"
@@ -25,12 +25,10 @@ var planCmd = &cobra.Command{
 
 		description := args[0]
 
-		plan, err := NewPlanner(db).Plan(description)
+		_, err = NewPlanner(db).Plan(description)
 		if err != nil {
 			return err
 		}
-
-		fmt.Println(plan.Content)
 
 		return nil
 	},
@@ -110,7 +108,7 @@ func (p *Planner) Plan(description string) (*Plan, error) {
 	}
 
 	editor := NewEditor()
-	err = editor.WriteToFile("tmp/"+result.FilenameToChangeOrCreate, result.CompleteFileContents)
+	err = editor.WriteToFile(filepath.Join(".ouro/tmp", result.FilenameToChangeOrCreate), result.CompleteFileContents)
 	if err != nil {
 		return nil, err
 	}

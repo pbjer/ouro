@@ -8,7 +8,6 @@ const (
 	RoleSystem    Role = "system"
 	RoleUser      Role = "user"
 	RoleAssistant Role = "assistant"
-	RoleTool      Role = "tool"
 )
 
 type Message struct {
@@ -38,8 +37,4 @@ func UserMessage(content string) Message {
 
 func AssistantMessage(content string) Message {
 	return NewMessage(RoleAssistant, content)
-}
-
-func ToolMessage(content string) Message {
-	return NewMessage(RoleTool, content)
 }

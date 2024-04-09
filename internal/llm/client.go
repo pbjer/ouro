@@ -57,12 +57,17 @@ func (c *Client) Map(source string, target interface{}) error {
 		fields = append(fields, jsonTag)
 	}
 
-	prompt := fmt.Sprintf("Given the source data:\n\n%s\n\nProvide a JSON object with the following fields: %s.", source, fields)
+	prompt := fmt.Sprintf("Given the source data:\n\n%s\n\nProvide a JSON object filled out with the values from the source data that correspond to these fields: %s.", source, fields)
 	prompt += "\nIMPORTANT: DO NOT WRAP THE RESPONSE IN MARKDOWN, IT MUST BE RAW JSON!"
+	prompt += "\nIMPORTANT: THE FIELDS MUST APPEAR IN THE JSON EXACTLY AS WRITTEN ABOVE!"
+	prompt += "\nIMPORTANT: YOU MUST PROPERLY ESCAPE ALL QUOTES WITHIN THE CONTENT SO THAT THE JSON IS VALID!"
+
+	fmt.Println(prompt)
+
 	resp, err := c.client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model: openai.GPT4Turbo1106,
+			Model: openai.GPT3Dot5Turbo,
 			Messages: []openai.ChatCompletionMessage{
 				{Role: string(RoleSystem), Content: prompt},
 			},
@@ -75,14 +80,15 @@ func (c *Client) Map(source string, target interface{}) error {
 
 	lastMessage := resp.Choices[0].Message.Content
 
+	fmt.Println(lastMessage)
+
 	// Ensure we only have JSON format in the message.
 	if !json.Valid([]byte(lastMessage)) {
-		fmt.Println(lastMessage)
 		cleaned := TrimNonJSON(lastMessage)
 		if !json.Valid([]byte(cleaned)) {
-			return fmt.Errorf("")
+			return fmt.Errorf("json still invalid after cleaning")
 		}
-		return fmt.Errorf("response from LLM is not valid JSON")
+		lastMessage = cleaned
 	}
 
 	return json.Unmarshal([]byte(lastMessage), target)
