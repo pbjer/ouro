@@ -12,7 +12,7 @@ make install
 Running `make install` will install ouro to `/usr/local/bin/`
 
 ## Usage
-To get started, initialize ouro at the root of your project.
+To get started, initialize ouro at the root of your project. An `.ouro/` directory will be created at the root of the project.
 ```bash
 cd path/to/project
 ouro new

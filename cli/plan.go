@@ -109,7 +109,7 @@ func (p *Planner) Plan(description string) (*Plan, error) {
 	}
 
 	editor := NewEditor()
-	err = editor.WriteToFile(filepath.Join(".ouro/tmp", result.FilenameToChangeOrCreate), result.CompleteFileContents)
+	err = editor.WriteToFile(filepath.Join("./", result.FilenameToChangeOrCreate), result.CompleteFileContents)
 	if err != nil {
 		return nil, err
 	}
