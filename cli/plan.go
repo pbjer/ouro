@@ -109,6 +109,12 @@ func (p *Planner) Plan(description string) (*Plan, error) {
 		return nil, err
 	}
 
+	editor := NewEditor()
+	err = editor.WriteToFile("tmp/"+result.FilenameToChangeOrCreate, result.CompleteFileContents)
+	if err != nil {
+		return nil, err
+	}
+
 	return &plan, nil
 }
 
