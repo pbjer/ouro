@@ -1,4 +1,5 @@
 # Ouro
+![stability-unstable](https://img.shields.io/badge/stability-unstable-red.svg)
 
 Ouro is a command line utility for planning and executing changes within a software development project using LLMs.
 
