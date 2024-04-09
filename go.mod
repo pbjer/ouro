@@ -1,4 +1,4 @@
-module ouro
+module github.com/pbjer/ouro
 
 go 1.22.2
 

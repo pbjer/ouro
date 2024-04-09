@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
-	"ouro/cli" // Replace with your actual package path
+
+	"github.com/pbjer/ouro/cli" // Replace with your actual package path
 )
 
 func main() {

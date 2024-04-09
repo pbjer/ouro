@@ -3,9 +3,10 @@ package cli
 import (
 	"fmt"
 	"os"
-	"ouro/internal/llm"
 	"path/filepath"
 	"strings"
+
+	"github.com/pbjer/ouro/internal/llm"
 
 	"gorm.io/gorm"
 )

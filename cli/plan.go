@@ -2,10 +2,11 @@ package cli
 
 import (
 	"errors"
-	"ouro/internal/llm"
-	"ouro/internal/prompt"
 	"path/filepath"
 	"strings"
+
+	"github.com/pbjer/ouro/internal/llm"
+	"github.com/pbjer/ouro/internal/prompt"
 
 	"gorm.io/gorm"
 

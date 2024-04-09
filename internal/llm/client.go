@@ -4,8 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"ouro/internal/env"
 	"reflect"
+
+	"github.com/pbjer/ouro/internal/env"
 
 	"github.com/sashabaranov/go-openai"
 )
