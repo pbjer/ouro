@@ -23,8 +23,9 @@ func (c *Client) Generate(thread *Thread) error {
 	resp, err := c.client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model:    openai.GPT3Dot5Turbo,
-			Messages: ThreadToOpenAICompletionMessages(thread),
+			Model:       openai.GPT4Turbo1106,
+			Messages:    ThreadToOpenAICompletionMessages(thread),
+			Temperature: 0,
 		},
 	)
 	if err != nil {

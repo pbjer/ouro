@@ -3,10 +3,10 @@ package cli
 import (
 	"fmt"
 	"os"
+	"ouro/internal/llm"
 	"path/filepath"
 	"strings"
 
-	"github.com/pkoukk/tiktoken-go"
 	"gorm.io/gorm"
 )
 
@@ -72,22 +72,13 @@ func (l *ContextLoader) processDirectory(dirPath string) error {
 	})
 }
 
-func tokenCount(text string) (int, error) {
-	tkm, err := tiktoken.EncodingForModel("gpt-4")
-	if err != nil {
-		err = fmt.Errorf("error getting encoding for model: %v", err)
-		return 0, err
-	}
-	return len(tkm.Encode(text, nil, nil)), nil
-}
-
 func (l *ContextLoader) processFile(filePath string) error {
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return fmt.Errorf("error reading file %s: %w", filePath, err)
 	}
 
-	tokenCount, err := tokenCount(string(content))
+	tokenCount, err := llm.NumberOfTokens(string(content))
 	if err != nil {
 		return err
 	}
