@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"ouro/internal/env"
-	"strings"
 
 	"github.com/sashabaranov/go-openai"
 )
@@ -20,6 +19,11 @@ func NewClient() *Client {
 }
 
 func (c *Client) Generate(thread *Thread) error {
+	numTokens, err := thread.NumberOfTokens()
+	if err != nil {
+		return err
+	}
+	fmt.Printf("\n\nGeneration request tokens: %d\n\n", numTokens)
 	resp, err := c.client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
@@ -37,16 +41,12 @@ func (c *Client) Generate(thread *Thread) error {
 
 func ThreadToOpenAICompletionMessages(thread *Thread) (messages []openai.ChatCompletionMessage) {
 	for _, message := range thread.Messages {
-		fmt.Println("------------------")
 		messages = append(messages, MessageToOpenAICompletionMessage(message))
 	}
-	fmt.Println("------------------")
 	return
 }
 
 func MessageToOpenAICompletionMessage(message Message) openai.ChatCompletionMessage {
-	fmt.Println(strings.ToUpper(string(message.Role)) + ":")
-	fmt.Println(message.Content)
 	return openai.ChatCompletionMessage{
 		Role:    string(message.Role),
 		Content: message.Content,

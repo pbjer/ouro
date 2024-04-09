@@ -1,5 +1,7 @@
 package llm
 
+import "strings"
+
 type Role string
 
 const (
@@ -19,6 +21,11 @@ func NewMessage(role Role, content string) Message {
 		Role:    role,
 		Content: content,
 	}
+}
+
+func (m *Message) String() string {
+	fmtRole := strings.ToUpper(string(m.Role))
+	return "[" + fmtRole + "]" + "-----------------------------------\n" + m.Content
 }
 
 func SystemMessage(content string) Message {
