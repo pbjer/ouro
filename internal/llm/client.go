@@ -52,7 +52,7 @@ func (c *Client) Map(source string, target interface{}) error {
 		return fmt.Errorf("target must be a pointer to a struct")
 	}
 
-	jsonString, err := StructToJSON(targetType)
+	jsonString, err := StructToJSON(target)
 	if err != nil {
 		return err
 	}
@@ -76,6 +76,8 @@ func (c *Client) Map(source string, target interface{}) error {
 	}
 
 	lastMessage := resp.Choices[0].Message.Content
+
+	fmt.Println(lastMessage)
 
 	// Ensure we only have JSON format in the message.
 	if !json.Valid([]byte(lastMessage)) {
