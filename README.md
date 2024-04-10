@@ -6,7 +6,7 @@ Ouro is a command line utility for planning and executing changes within a softw
 ## Installation
 **MacOS**
 ```shell
-$ git clone github.com/pbjer/ouro
+$ git clone https://github.com/pbjer/ouro.git
 $ cd ouro
 $ make install
 ```
