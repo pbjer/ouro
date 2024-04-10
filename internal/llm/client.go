@@ -66,7 +66,7 @@ func (c *Client) Map(source string, target interface{}) error {
 	resp, err := c.client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model: openai.GPT3Dot5Turbo,
+			Model: openai.GPT4Turbo1106,
 			Messages: []openai.ChatCompletionMessage{
 				{Role: string(RoleSystem), Content: prompt},
 			},
