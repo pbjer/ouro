@@ -2,7 +2,6 @@ package cli
 
 import (
 	"errors"
-	"path/filepath"
 	"strings"
 
 	"github.com/pbjer/ouro/internal/llm"
@@ -67,6 +66,10 @@ func NewPlanner(db *gorm.DB) *Planner {
 }
 
 type EditorFunction struct {
+	Edits []Edit `json:"edits"`
+}
+
+type Edit struct {
 	FilenameToChangeOrCreate string `json:"file_name_to_change_or_create"`
 	CompleteFileContents     string `json:"complete_file_contents"`
 }
@@ -114,8 +117,7 @@ func (p *Planner) Plan(description string) (*Plan, error) {
 		return nil, err
 	}
 
-	editor := NewEditor()
-	err = editor.WriteToFile(filepath.Join("./", result.FilenameToChangeOrCreate), result.CompleteFileContents)
+	err = NewEditor().Edit(result.Edits...)
 	if err != nil {
 		return nil, err
 	}

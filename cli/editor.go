@@ -13,7 +13,7 @@ func NewEditor() *Editor {
 	return &Editor{}
 }
 
-func (e *Editor) WriteToFile(filePath string, content string) error {
+func (e *Editor) edit(filePath string, content string) error {
 	// Extract the directory part from the filePath.
 	dir := filepath.Dir(filePath)
 
@@ -36,5 +36,15 @@ func (e *Editor) WriteToFile(filePath string, content string) error {
 
 	fmt.Println("Updated", filePath)
 
+	return nil
+}
+
+func (e *Editor) Edit(edits ...Edit) error {
+	for _, edit := range edits {
+		err := e.edit(edit.FilenameToChangeOrCreate, edit.CompleteFileContents)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }

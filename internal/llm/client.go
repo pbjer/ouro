@@ -51,18 +51,12 @@ func (c *Client) Map(source string, target interface{}) error {
 	if targetType.Kind() != reflect.Ptr || targetType.Elem().Kind() != reflect.Struct {
 		return fmt.Errorf("target must be a pointer to a struct")
 	}
-	structType := targetType.Elem()
-	fields := make([]string, 0, structType.NumField())
-	for i := 0; i < structType.NumField(); i++ {
-		field := structType.Field(i)
-		jsonTag, ok := field.Tag.Lookup("json")
-		if !ok {
-			continue
-		}
-		fields = append(fields, jsonTag)
-	}
 
-	prompt := fmt.Sprintf("Given the source data:\n\n%s\n\nProvide a JSON object filled out with the values from the source data that correspond to these fields: %s.", source, fields)
+	jsonString, err := StructToJSON(targetType)
+	if err != nil {
+		return err
+	}
+	prompt := fmt.Sprintf("Given the source data:\n\n%s\n\nProvide a JSON object filled out with the values from the source data that related to this example JSON OBJECT:%s.", source, jsonString)
 	prompt += "\nIMPORTANT: DO NOT WRAP THE RESPONSE IN MARKDOWN, IT MUST BE RAW JSON!"
 	prompt += "\nIMPORTANT: THE FIELDS MUST APPEAR IN THE JSON EXACTLY AS WRITTEN ABOVE!"
 	prompt += "\nIMPORTANT: YOU MUST PROPERLY ESCAPE ALL QUOTES WITHIN THE CONTENT SO THAT THE JSON IS VALID!"
@@ -85,6 +79,7 @@ func (c *Client) Map(source string, target interface{}) error {
 
 	// Ensure we only have JSON format in the message.
 	if !json.Valid([]byte(lastMessage)) {
+		fmt.Println(lastMessage)
 		cleaned := TrimNonJSON(lastMessage)
 		if !json.Valid([]byte(cleaned)) {
 			return fmt.Errorf("json still invalid after cleaning")
