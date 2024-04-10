@@ -16,8 +16,11 @@ type Client struct {
 }
 
 func NewClient() *Client {
+	config := openai.DefaultConfig(env.GroqAPIKey())
+	config.BaseURL = "https://api.groq.com/openai/v1"
+	client := openai.NewClientWithConfig(config)
 	return &Client{
-		client: openai.NewClient(env.OpenAIAPIKey()),
+		client: client,
 	}
 }
 
