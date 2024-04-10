@@ -80,7 +80,7 @@ func (p *Planner) Plan(description string) (*Plan, error) {
 	}
 
 	var psString string
-	err := projectStructure("", "", &psString)
+	err := projectStructure("./", "", &psString)
 	if err != nil {
 		return nil, err
 	}

@@ -34,7 +34,7 @@ func (c *Client) Generate(thread *Thread) error {
 	resp, err := c.client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model:       openai.GPT3Dot5Turbo,
+			Model:       "mixtral-8x7b-32768",
 			Messages:    ThreadToOpenAICompletionMessages(thread),
 			Temperature: 0,
 		},
@@ -72,7 +72,7 @@ func (c *Client) Map(source string, target interface{}) error {
 	resp, err := c.client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model:       openai.GPT4Turbo1106,
+			Model:       "mixtral-8x7b-32768",
 			Messages:    ThreadToOpenAICompletionMessages(thread),
 			Temperature: 0,
 		},
