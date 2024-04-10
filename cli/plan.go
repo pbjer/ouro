@@ -79,9 +79,15 @@ func (p *Planner) Plan(description string) (*Plan, error) {
 		return nil, errors.New("failed to load context for plan")
 	}
 
+	var psString string
+	err := projectStructure("", "", &psString)
+	if err != nil {
+		return nil, err
+	}
 	planStartPrompt, err := prompt.New(prompt.PlannerCreatePlanPrompt, prompt.PlannerCreatePlanData{
-		Change:  description,
-		Context: NewContextPrompter(context...).Prompt(),
+		Change:           description,
+		ProjectStructure: psString,
+		Context:          NewContextPrompter(context...).Prompt(),
 	}).Render()
 	if err != nil {
 		return nil, err

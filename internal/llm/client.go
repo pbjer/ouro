@@ -27,6 +27,7 @@ func (c *Client) Generate(thread *Thread) error {
 		return err
 	}
 	fmt.Println("Request tokens:", numTokens)
+	fmt.Println(thread.String())
 	resp, err := c.client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
@@ -63,13 +64,13 @@ func (c *Client) Map(source string, target interface{}) error {
 	prompt += "\nIMPORTANT: THE FIELDS MUST APPEAR IN THE JSON EXACTLY AS WRITTEN ABOVE!"
 	prompt += "\nIMPORTANT: YOU MUST PROPERLY ESCAPE ALL QUOTES WITHIN THE CONTENT SO THAT THE JSON IS VALID!"
 
+	thread := NewThread(SystemMessage(prompt))
+	fmt.Println(thread.String())
 	resp, err := c.client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model: openai.GPT4Turbo1106,
-			Messages: []openai.ChatCompletionMessage{
-				{Role: string(RoleSystem), Content: prompt},
-			},
+			Model:       openai.GPT4Turbo1106,
+			Messages:    ThreadToOpenAICompletionMessages(thread),
 			Temperature: 0,
 		},
 	)
