@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/pbjer/ouro/internal/env"
 
@@ -59,7 +60,7 @@ func (c *Client) Map(source string, target interface{}) error {
 	prompt := fmt.Sprintf("Given the source data:\n\n%s\n\nProvide a JSON object filled out with the values from the source data that related to this example JSON OBJECT:%s.", source, jsonString)
 	prompt += "\nIMPORTANT: DO NOT WRAP THE RESPONSE IN MARKDOWN, IT MUST BE RAW JSON!"
 	prompt += "\nIMPORTANT: THE FIELDS MUST APPEAR IN THE JSON EXACTLY AS WRITTEN ABOVE!"
-	prompt += "\nIMPORTANT: YOU MUST PROPERLY ESCAPE ALL QUOTES WITHIN THE CONTENT SO THAT THE JSON IS VALID!"
+	prompt += "\nIMPORTANT: YOU MUST PROPERLY ESCAPE ALL QUOTES AND TABS WITHIN THE CONTENT SO THAT THE JSON IS VALID!"
 
 	thread := NewThread(SystemMessage(prompt))
 	fmt.Println(thread.String())
@@ -81,10 +82,10 @@ func (c *Client) Map(source string, target interface{}) error {
 
 	// Ensure we only have JSON format in the message.
 	if !json.Valid([]byte(lastMessage)) {
-		fmt.Println(lastMessage)
-		cleaned := TrimNonJSON(lastMessage)
+		trimmed := TrimNonJSON(lastMessage)
+		cleaned := CleanJSONString(trimmed)
 		if !json.Valid([]byte(cleaned)) {
-			return fmt.Errorf("json still invalid after cleaning")
+			return json.Unmarshal([]byte(lastMessage), target)
 		}
 		lastMessage = cleaned
 	}
@@ -104,4 +105,11 @@ func MessageToOpenAICompletionMessage(message Message) openai.ChatCompletionMess
 		Role:    string(message.Role),
 		Content: message.Content,
 	}
+}
+
+func CleanJSONString(s string) string {
+	// Replace unescaped tabs with \\t (the escaped tab in JSON).
+	cleaned := strings.Replace(s, "\t", "\\t", -1)
+
+	return cleaned
 }
