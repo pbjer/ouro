@@ -100,7 +100,5 @@ func (l *ContextLoader) processFile(filePath string) error {
 		l.db.Save(&memory)
 	}
 
-	fmt.Println("Loaded", filePath)
-
 	return nil
 }

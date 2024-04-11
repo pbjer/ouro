@@ -30,6 +30,15 @@ var loadCmd = &cobra.Command{
 			}
 		}
 
+		paths, err := ListFiles(db)
+		if err != nil {
+			return err
+		}
+
+		for _, path := range paths {
+			fmt.Println("Loaded", path.Path, "-", path.Tokens)
+		}
+
 		return nil
 	},
 }

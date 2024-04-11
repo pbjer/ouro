@@ -7,7 +7,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// Define the list command
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List all loaded file paths",
@@ -18,13 +17,17 @@ var listCmd = &cobra.Command{
 			return err
 		}
 
-		paths, err := ListFilePaths(db)
+		paths, err := ListFiles(db)
 		if err != nil {
 			return err
 		}
 
 		if len(paths) == 0 {
 			fmt.Println("Nothing to list.")
+		}
+
+		for _, path := range paths {
+			fmt.Println(path.Path, "-", path.Tokens)
 		}
 
 		return nil
@@ -35,18 +38,10 @@ func init() {
 	rootCmd.AddCommand(listCmd)
 }
 
-// New function to list all file paths
-func ListFilePaths(db *gorm.DB) ([]string, error) {
+func ListFiles(db *gorm.DB) ([]Context, error) {
 	var files []Context
 	if result := db.Find(&files); result.Error != nil {
 		return nil, result.Error
 	}
-
-	paths := make([]string, len(files))
-	for i, file := range files {
-		fmt.Println(file.Path, "-", file.Tokens)
-		paths[i] = file.Path
-	}
-
-	return paths, nil
+	return files, nil
 }
