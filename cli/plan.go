@@ -101,7 +101,8 @@ func (p *Planner) Plan(description string) (*Plan, error) {
 		llm.UserMessage(planStartPrompt),
 	)
 
-	client := llm.NewClient()
+	client := llm.NewClient(llm.OpenAI)
+
 	err = client.Generate(thread)
 	if err != nil {
 		return nil, err

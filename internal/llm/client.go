@@ -15,16 +15,35 @@ import (
 )
 
 type Client struct {
-	client *openai.Client
+	client  *openai.Client
+	baseURL string
+	model   string
+	apiKey  string
 }
 
-func NewClient() *Client {
+type ClientOption func(c *Client)
+
+func Groq(client *Client) {
+	client.baseURL = "https://api.groq.com/openai/v1"
+	client.apiKey = env.GroqAPIKey()
+}
+
+func OpenAI(client *Client) {
+	client.baseURL = "https://api.openai.com/v1/chat/completions"
+	client.apiKey = env.OpenAIAPIKey()
+}
+
+func NewClient(options ...ClientOption) *Client {
 	config := openai.DefaultConfig(env.GroqAPIKey())
 	config.BaseURL = "https://api.groq.com/openai/v1"
-	client := openai.NewClientWithConfig(config)
-	return &Client{
-		client: client,
+	openaiclient := openai.NewClientWithConfig(config)
+	client := &Client{
+		client: openaiclient,
 	}
+	for _, option := range options {
+		option(client)
+	}
+	return client
 }
 
 func (c *Client) Generate(thread *Thread) error {
