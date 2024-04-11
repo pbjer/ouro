@@ -45,7 +45,9 @@ func (c *Client) Generate(thread *Thread) error {
 	if err != nil {
 		return err
 	}
-	thread.AddMessages(AssistantMessage(resp.Choices[0].Message.Content))
+	result := AssistantMessage(resp.Choices[0].Message.Content)
+	fmt.Println(result)
+	thread.AddMessages(result)
 	return nil
 }
 
@@ -69,20 +71,12 @@ func (c *Client) Map(source string, target interface{}) error {
 	}
 
 	thread := NewThread(SystemMessage(mappingPrompt))
-	fmt.Println(thread.String())
-	resp, err := c.client.CreateChatCompletion(
-		context.Background(),
-		openai.ChatCompletionRequest{
-			Model:       "mixtral-8x7b-32768",
-			Messages:    ThreadToOpenAICompletionMessages(thread),
-			Temperature: 0,
-		},
-	)
+	err = c.Generate(thread)
 	if err != nil {
 		return err
 	}
 
-	lastMessage := resp.Choices[0].Message.Content
+	lastMessage := thread.LastMessage().Content
 
 	fmt.Println(lastMessage)
 
