@@ -35,9 +35,13 @@ var loadCmd = &cobra.Command{
 			return err
 		}
 
+		totalTokens := 0
 		for _, path := range paths {
-			fmt.Println("Loaded", path.Path, "-", path.Tokens)
+			fmt.Println(path.Path, "-", path.Tokens)
+			totalTokens += path.Tokens
 		}
+
+		fmt.Println("LOADED:", totalTokens)
 
 		return nil
 	},

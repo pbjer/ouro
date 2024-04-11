@@ -32,8 +32,20 @@ var reloadCmd = &cobra.Command{
 			if err != nil {
 				return fmt.Errorf("failed to reload path %s: %w", file.Path, err)
 			}
-			fmt.Println("Reloaded", file.Path, "-", file.Tokens)
 		}
+
+		paths, err := ListFiles(db)
+		if err != nil {
+			return err
+		}
+
+		totalTokens := 0
+		for _, path := range paths {
+			fmt.Println(path.Path, "-", path.Tokens)
+			totalTokens += path.Tokens
+		}
+
+		fmt.Println("LOADED:", totalTokens)
 
 		return nil
 	},

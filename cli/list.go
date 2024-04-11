@@ -26,9 +26,14 @@ var listCmd = &cobra.Command{
 			fmt.Println("Nothing to list.")
 		}
 
+		totalTokens := 0
+
 		for _, path := range paths {
 			fmt.Println(path.Path, "-", path.Tokens)
+			totalTokens += path.Tokens
 		}
+
+		fmt.Println("TOTAL:", totalTokens)
 
 		return nil
 	},
