@@ -41,7 +41,7 @@ var loadCmd = &cobra.Command{
 			totalTokens += path.Tokens
 		}
 
-		fmt.Println("LOADED:", totalTokens)
+		fmt.Println("TOTAL:", totalTokens)
 
 		return nil
 	},
