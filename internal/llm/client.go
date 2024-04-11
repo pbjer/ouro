@@ -32,14 +32,12 @@ func Groq(client *Client) {
 func OpenAI(client *Client) {
 	client.baseURL = "https://api.openai.com/v1"
 	client.apiKey = env.OpenAIAPIKey()
-	client.model = openai.GPT4TurboPreview
+	client.model = openai.GPT4Turbo0125
 }
 
 func NewClient(options ...ClientOption) *Client {
-	client := &Client{ // default client
-		baseURL: "https://api.openai.com/v1",
-		apiKey:  "Bearer " + env.OpenAIAPIKey(),
-	}
+	client := &Client{}
+	OpenAI(client) // Default client
 
 	for _, option := range options {
 		option(client)
