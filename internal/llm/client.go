@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/pbjer/ouro/internal/prompt"
+
 	"github.com/pbjer/ouro/internal/env"
 
 	"github.com/sashabaranov/go-openai"
@@ -57,12 +59,16 @@ func (c *Client) Map(source string, target interface{}) error {
 	if err != nil {
 		return err
 	}
-	prompt := fmt.Sprintf("Given the source data:\n\n%s\n\nProvide a JSON object filled out with the values from the source data that related to this example JSON OBJECT:%s.", source, jsonString)
-	prompt += "\nIMPORTANT: DO NOT WRAP THE RESPONSE IN MARKDOWN, IT MUST BE RAW JSON!"
-	prompt += "\nIMPORTANT: THE FIELDS MUST APPEAR IN THE JSON EXACTLY AS WRITTEN ABOVE!"
-	prompt += "\nIMPORTANT: YOU MUST PROPERLY ESCAPE ALL QUOTES AND TABS WITHIN THE CONTENT SO THAT THE JSON IS VALID, BUT DO NOT ESCAPE THE OBJECT KEYS!"
 
-	thread := NewThread(SystemMessage(prompt))
+	mappingPrompt, err := prompt.New(prompt.JSONMappingPromptTemplate, prompt.JSONMappingPromptData{
+		Source:      source,
+		ExampleJSON: jsonString,
+	}).Render()
+	if err != nil {
+		return err
+	}
+
+	thread := NewThread(SystemMessage(mappingPrompt))
 	fmt.Println(thread.String())
 	resp, err := c.client.CreateChatCompletion(
 		context.Background(),
