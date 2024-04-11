@@ -26,23 +26,30 @@ type ClientOption func(c *Client)
 func Groq(client *Client) {
 	client.baseURL = "https://api.groq.com/openai/v1"
 	client.apiKey = env.GroqAPIKey()
+	client.model = "mixtral-8x7b-32768"
 }
 
 func OpenAI(client *Client) {
-	client.baseURL = "https://api.openai.com/v1/chat/completions"
+	client.baseURL = "https://api.openai.com/v1"
 	client.apiKey = env.OpenAIAPIKey()
+	client.model = openai.GPT4TurboPreview
 }
 
 func NewClient(options ...ClientOption) *Client {
-	config := openai.DefaultConfig(env.GroqAPIKey())
-	config.BaseURL = "https://api.groq.com/openai/v1"
-	openaiclient := openai.NewClientWithConfig(config)
-	client := &Client{
-		client: openaiclient,
+	client := &Client{ // default client
+		baseURL: "https://api.openai.com/v1",
+		apiKey:  "Bearer " + env.OpenAIAPIKey(),
 	}
+
 	for _, option := range options {
 		option(client)
 	}
+
+	config := openai.DefaultConfig(client.apiKey)
+	config.BaseURL = client.baseURL
+
+	client.client = openai.NewClientWithConfig(config)
+
 	return client
 }
 
@@ -56,7 +63,7 @@ func (c *Client) Generate(thread *Thread) error {
 	resp, err := c.client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model:       "mixtral-8x7b-32768",
+			Model:       c.model,
 			Messages:    ThreadToOpenAICompletionMessages(thread),
 			Temperature: 0,
 		},

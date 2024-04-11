@@ -65,13 +65,13 @@ func NewPlanner(db *gorm.DB) *Planner {
 	return &Planner{db}
 }
 
-type EditorFunction struct {
-	Edits []Edit `json:"edits"`
-}
-
-type Edit struct {
-	FilenameToChangeOrCreate string `json:"file_name_to_change_or_create"`
-	CompleteFileContents     string `json:"complete_file_contents"`
+func (p *Planner) GetLLMPreference() (string, error) {
+	var config LLMConfig
+	result := p.db.Last(&config) // Assuming you're storing the latest preference as the most recent entry.
+	if result.Error != nil {
+		return "", result.Error
+	}
+	return config.Provider, nil
 }
 
 func (p *Planner) Plan(description string) (*Plan, error) {
@@ -101,7 +101,18 @@ func (p *Planner) Plan(description string) (*Plan, error) {
 		llm.UserMessage(planStartPrompt),
 	)
 
-	client := llm.NewClient(llm.OpenAI)
+	clientChoice, err := p.GetLLMPreference()
+	if err != nil {
+		return nil, err
+	}
+	var clientOption llm.ClientOption
+	switch clientChoice {
+	case "openai":
+		clientOption = llm.OpenAI
+	case "groq":
+		clientOption = llm.Groq
+	}
+	client := llm.NewClient(clientOption)
 
 	err = client.Generate(thread)
 	if err != nil {
@@ -124,6 +135,15 @@ func (p *Planner) Plan(description string) (*Plan, error) {
 	}
 
 	return &plan, nil
+}
+
+type EditorFunction struct {
+	Edits []Edit `json:"edits"`
+}
+
+type Edit struct {
+	FilenameToChangeOrCreate string `json:"file_name_to_change_or_create"`
+	CompleteFileContents     string `json:"complete_file_contents"`
 }
 
 type Plan struct {
